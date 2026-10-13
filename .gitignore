@@ -1,0 +1,16 @@
+# Arquivo PDF muito grande (28.8 MB - excede limite do GitHub de 25 MB)
+LEIS AMBIENTAIS/Lei 413 2016 Política Proteção Meio Ambiente.pdf
+
+# Arquivos raster pesados (GeoTIFF)
+*.tif
+*.tiff
+*.aux.xml
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Arquivos temporários
+*.tmp
+*.bak
