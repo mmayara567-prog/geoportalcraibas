@@ -65,7 +65,7 @@
           <i class="fa-solid fa-cloud-arrow-down text-green-600"></i>
           <span>Central de Downloads</span>
           <span class="hidden sm:inline-flex px-1.5 py-0.5 rounded-full text-[9px] bg-gray-200 text-gray-700 font-bold">
-            30 arquivos
+            33 arquivos
           </span>
         </button>
       </nav>
@@ -107,195 +107,221 @@
     <!-- ABA 1: MAPA INTERATIVO & GEOPORTAL (ATIVA POR PADRÃO)  -->
     <!-- ====================================================== -->
     <main id="map-tab" class="tab-panel active gis-container">
-      
-      <!-- BARRA LATERAL ESQUERDA: CAMADAS ORGANIZADAS POR TIPOLOGIA -->
-      <aside id="gis-sidebar" class="gis-sidebar">
-        
-        <!-- Cabeçalho da Sidebar -->
-        <div class="p-3 border-b border-gray-200 bg-white flex items-center justify-between">
-          <div class="sidebar-header-bar">
-            <h3 class="text-xs font-extrabold text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-layer-group text-green-600"></i> Camadas do Geoportal
-            </h3>
-            <span class="text-[10px] text-gray-400">Classificadas por tipologia cartográfica</span>
-          </div>
-          <div class="flex items-center gap-1">
-            <button onclick="resetCraibasExtent()" class="p-1.5 text-gray-400 hover:text-green-700 hover:bg-green-50 rounded-lg text-xs transition-colors" title="Enquadrar Limites de Craíbas">
-              <i class="fa-solid fa-compress"></i>
-            </button>
-            <button onclick="toggleMobileSidebar()" class="md:hidden p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg text-xs" title="Fechar Menu">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </div>
-        </div>
 
-        <!-- Presets Temáticos Rápidos (Mapas Prontos de Gestão) -->
-        <div class="p-2.5 border-b border-gray-100 bg-green-50/60">
-          <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1.5">
-            <i class="fa-solid fa-bolt text-green-600 mr-1"></i>Mapas Rápidos de Gestão:
-          </span>
-          <div class="grid grid-cols-2 gap-1.5">
-            <button onclick="applyThematicPreset('geral')" class="preset-btn px-2 py-1 text-[11px] font-semibold bg-white hover:bg-green-50 text-gray-700 rounded border border-gray-200 shadow-sm flex items-center gap-1">
-              <i class="fa-solid fa-landmark text-green-600 text-[10px]"></i> Visão Geral
-            </button>
-            <button onclick="applyThematicPreset('planejamento')" class="preset-btn px-2 py-1 text-[11px] font-semibold bg-white hover:bg-green-50 text-gray-700 rounded border border-gray-200 shadow-sm flex items-center gap-1">
-              <i class="fa-solid fa-draw-polygon text-green-600 text-[10px]"></i> Zoneamento
-            </button>
-            <button onclick="applyThematicPreset('ambiental')" class="preset-btn px-2 py-1 text-[11px] font-semibold bg-white hover:bg-green-50 text-gray-700 rounded border border-gray-200 shadow-sm flex items-center gap-1">
-              <i class="fa-solid fa-leaf text-green-500 text-[10px]"></i> Meio Ambiente
-            </button>
-            <button onclick="applyThematicPreset('social')" class="preset-btn px-2 py-1 text-[11px] font-semibold bg-white hover:bg-green-50 text-gray-700 rounded border border-gray-200 shadow-sm flex items-center gap-1">
-              <i class="fa-solid fa-users text-green-700 text-[10px]"></i> Demografia Censo
-            </button>
-          </div>
-        </div>
-
-        <!-- Barra de Busca de Camadas e Filtro de Tipologia -->
-        <div class="p-2.5 border-b border-gray-100 bg-white space-y-2">
-          <div class="relative">
-            <i class="fa-solid fa-filter absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-            <input type="text" placeholder="Filtrar camadas..." oninput="filterLayersInTree(this.value)" class="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:bg-white focus:border-green-400 transition-all">
-          </div>
-
-          <!-- Pílulas de filtro por tipologia -->
-          <div class="flex items-center gap-1 overflow-x-auto pb-1 text-[10px]">
-            <button class="typology-pill-btn active px-2 py-0.5 rounded-full bg-green-600 text-white font-medium whitespace-nowrap" data-typ="all" onclick="filterByTypology('all')">
-              Todas
-            </button>
-            <button class="typology-pill-btn px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium whitespace-nowrap" data-typ="gestao_publica" onclick="filterByTypology('gestao_publica')" title="Gestão Pública">
-              🏛️ Gestão
-            </button>
-            <button class="typology-pill-btn px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium whitespace-nowrap" data-typ="limites_demografia" onclick="filterByTypology('limites_demografia')" title="Demografia">
-              🗺️ Limites/Censo
-            </button>
-            <button class="typology-pill-btn px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium whitespace-nowrap" data-typ="sistema_viario" onclick="filterByTypology('sistema_viario')" title="Vias e Rodovias">
-              🛣️ Viário
-            </button>
-            <button class="typology-pill-btn px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium whitespace-nowrap" data-typ="zoneamento" onclick="filterByTypology('zoneamento')" title="Zoneamento Urbano e Rural">
-              🏙️ Zoneamento
-            </button>
-            <button class="typology-pill-btn px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium whitespace-nowrap" data-typ="mineracao_solos" onclick="filterByTypology('mineracao_solos')" title="Mineração e Solos">
-              ⛏️ Mineração
-            </button>
-            <button class="typology-pill-btn px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium whitespace-nowrap" data-typ="hidrografia" onclick="filterByTypology('hidrografia')" title="Bacias e Rios">
-              💧 Hidrografia
-            </button>
-          </div>
-
-          <div class="flex items-center justify-between text-[11px] pt-1">
-            <button onclick="enableAllLayers()" class="text-green-700 hover:text-green-900 font-semibold flex items-center gap-1">
-              <i class="fa-solid fa-check-double text-[10px]"></i> Ativar Todas
-            </button>
-            <span class="text-gray-200">|</span>
-            <button onclick="disableAllLayers()" class="text-gray-500 hover:text-gray-700 font-semibold flex items-center gap-1">
-              <i class="fa-solid fa-ban text-[10px]"></i> Desativar Todas
-            </button>
-          </div>
-        </div>
-
-        <!-- Container da Árvore de Camadas por Tipologia -->
-        <div id="layers-tree-container" class="flex-1 overflow-y-auto divide-y divide-gray-100">
-          <!-- Renderizado dinamicamente via js/map.js -->
-        </div>
-
-        <!-- Rodapé da Barra Lateral -->
-        <div class="p-2.5 border-t border-gray-200 bg-green-50/40 text-[11px] text-gray-500 flex items-center justify-between">
-          <span class="flex items-center gap-1.5">
-            <i class="fa-solid fa-compass text-green-600"></i> SIRGAS 2000
-          </span>
-          <button onclick="switchTab('downloads-tab')" class="text-green-700 hover:text-green-900 hover:underline font-bold flex items-center gap-1">
-            <i class="fa-solid fa-download text-[10px]"></i> Baixar Arquivos
-          </button>
-        </div>
-
-      </aside>
-
-      <!-- VIEWPORT DO MAPA (LEAFLET INTERATIVO) -->
-      <div class="gis-map-viewport">
+      <!-- VIEWPORT DO MAPA FULL-SCREEN (LEAFLET INTERATIVO) — ESTILO IMA -->
+      <div class="gis-map-viewport" style="position:relative;width:100%;height:100%;">
         
         <!-- O CANVAS DO MAPA LEAFLET -->
         <div id="map"></div>
 
-        <!-- BOTÃO MOBILE PARA ABRIR SIDEBAR -->
-        <button onclick="toggleMobileSidebar()" class="md:hidden absolute top-4 left-4 z-[550] bg-white text-slate-800 p-2.5 rounded-xl shadow-lg border border-slate-200 flex items-center gap-2 text-xs font-bold">
-          <i class="fa-solid fa-layer-group text-blue-600"></i> Camadas
-        </button>
+        <!-- ═══════════════════════════════════════════════════════
+             BARRA DE FERRAMENTAS VERTICAL FLUTUANTE (ESQUERDA)
+             ═══════════════════════════════════════════════════════ -->
+        <div id="map-left-toolbar" style="position:absolute;top:80px;left:12px;z-index:500;display:flex;flex-direction:column;gap:6px;">
 
-        <!-- BARRA FLUTUANTE DE BUSCA & FERRAMENTAS ESPACIAIS (CANTO SUPERIOR ESQUERDO) -->
-        <div class="absolute top-4 left-4 md:left-6 z-[500] flex flex-col gap-2">
-          
           <!-- Caixa de Busca de Feições no Mapa -->
-          <div class="relative w-64 sm:w-80">
+          <div class="relative" style="width:280px;">
             <div class="map-floating-panel flex items-center px-3 py-2">
-              <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs mr-2"></i>
-              <input type="text" id="map-search-input" placeholder="Buscar logradouro, UBS, bacia, secretaria..." oninput="searchMapFeatures(this.value)" class="w-full text-xs bg-transparent border-none outline-none text-slate-800 placeholder-slate-400">
+              <i class="fa-solid fa-magnifying-glass text-gray-400 text-xs mr-2"></i>
+              <input type="text" id="map-search-input" placeholder="Buscar logradouro, UBS, bacia..." oninput="searchMapFeatures(this.value)" class="w-full text-xs bg-transparent border-none outline-none text-gray-800 placeholder-gray-400">
             </div>
-            <!-- Dropdown de Resultados da Busca -->
-            <div id="map-search-results" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto z-[600]">
-              <!-- Renderizado dinamicamente -->
-            </div>
+            <div id="map-search-results" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto z-[600]"></div>
           </div>
 
-          <!-- Barra de Ferramentas de Análise Espacial -->
-          <div class="map-floating-panel flex items-center p-1 gap-1">
-            <button id="measure-dist-btn" onclick="setMeasureMode(measureMode === 'distance' ? null : 'distance')" class="p-2 rounded hover:bg-slate-100 text-slate-600 text-xs transition-colors" title="Régua de Medição (Distância em km/m)">
+          <!-- Ferramentas compactas em coluna -->
+          <div class="map-floating-panel flex flex-col p-1 gap-0.5" style="width:36px;">
+            <button id="measure-dist-btn" onclick="setMeasureMode(measureMode === 'distance' ? null : 'distance')"
+              style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:none;background:transparent;cursor:pointer;color:#4b5563;font-size:12px;transition:all .14s;"
+              onmouseover="this.style.background='#f0fdf4';this.style.color='#15803d';"
+              onmouseout="this.style.background='transparent';this.style.color='#4b5563';"
+              title="Medir Distância">
               <i class="fa-solid fa-ruler"></i>
             </button>
-            <button id="measure-area-btn" onclick="setMeasureMode(measureMode === 'area' ? null : 'area')" class="p-2 rounded hover:bg-slate-100 text-slate-600 text-xs transition-colors" title="Medir Área de Terrenos (m² e Hectares)">
+            <button id="measure-area-btn" onclick="setMeasureMode(measureMode === 'area' ? null : 'area')"
+              style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:none;background:transparent;cursor:pointer;color:#4b5563;font-size:12px;transition:all .14s;"
+              onmouseover="this.style.background='#f0fdf4';this.style.color='#15803d';"
+              onmouseout="this.style.background='transparent';this.style.color='#4b5563';"
+              title="Medir Área">
               <i class="fa-solid fa-draw-polygon"></i>
             </button>
-            <div class="w-[1px] h-5 bg-slate-200 mx-0.5"></div>
-            <button onclick="locateUser()" class="p-2 rounded hover:bg-slate-100 text-slate-600 text-xs transition-colors" title="Minha Localização (GPS)">
-              <i class="fa-solid fa-location-crosshairs text-blue-600"></i>
+            <div style="height:1px;background:#e5e7eb;margin:2px 4px;"></div>
+            <button onclick="locateUser()"
+              style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:none;background:transparent;cursor:pointer;color:#2563eb;font-size:12px;transition:all .14s;"
+              onmouseover="this.style.background='#eff6ff';"
+              onmouseout="this.style.background='transparent';"
+              title="Minha Localização (GPS)">
+              <i class="fa-solid fa-location-crosshairs"></i>
             </button>
-            <button onclick="resetCraibasExtent()" class="p-2 rounded hover:bg-slate-100 text-slate-600 text-xs transition-colors" title="Enquadrar Limites do Município de Craíbas">
-              <i class="fa-solid fa-house-chimney text-emerald-600"></i>
+            <button onclick="resetCraibasExtent()"
+              style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:none;background:transparent;cursor:pointer;color:#059669;font-size:12px;transition:all .14s;"
+              onmouseover="this.style.background='#f0fdf4';"
+              onmouseout="this.style.background='transparent';"
+              title="Enquadrar Craíbas">
+              <i class="fa-solid fa-house-chimney"></i>
             </button>
-            <button onclick="window.print()" class="p-2 rounded hover:bg-slate-100 text-slate-600 text-xs transition-colors" title="Imprimir / Exportar Mapa">
+            <button onclick="window.print()"
+              style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:none;background:transparent;cursor:pointer;color:#4b5563;font-size:12px;transition:all .14s;"
+              onmouseover="this.style.background='#f0fdf4';"
+              onmouseout="this.style.background='transparent';"
+              title="Imprimir Mapa">
               <i class="fa-solid fa-print"></i>
             </button>
           </div>
 
-          <!-- Informação / Medições Ativas -->
-          <div id="measure-info-box" class="hidden map-floating-panel px-3 py-2 text-xs text-slate-700 max-w-xs border-l-4 border-l-blue-600 shadow-lg">
+          <!-- Painel de Medição Ativo -->
+          <div id="measure-info-box" class="hidden map-floating-panel px-3 py-2 text-xs text-slate-700 border-l-4 border-l-blue-600 shadow-lg" style="max-width:280px;">
             Clique no mapa para medir...
           </div>
-
         </div>
 
-        <!-- SELETOR FLUTUANTE DE BASEMAPS (CANTO SUPERIOR DIREITO) -->
-        <div class="absolute top-4 right-14 z-[500] map-floating-panel p-1.5 flex items-center gap-1.5 text-xs">
+        <!-- ═══════════════════════════════════════════════════════
+             SELETOR DE BASEMAP (CANTO SUPERIOR — CENTRO/ESQUERDA)
+             ═══════════════════════════════════════════════════════ -->
+        <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:500;" class="map-floating-panel p-1.5 flex items-center gap-1.5 text-xs">
           <span class="text-[10px] font-bold text-slate-500 px-1 uppercase tracking-wider hidden sm:inline">
-            <i class="fa-solid fa-layer-group text-blue-600 mr-1"></i>Mapa Base:
+            <i class="fa-solid fa-layer-group text-green-600 mr-1"></i>Base:
           </span>
-          <button class="basemap-option active px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all" data-basemap="satellite" onclick="switchBasemap('satellite')" title="Imagem de Satélite de Alta Resolução Esri">
+          <button class="basemap-option active px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all" data-basemap="satellite" onclick="switchBasemap('satellite')" title="Satélite Esri">
             <i class="fa-solid fa-satellite"></i> Satélite
           </button>
-          <button class="basemap-option px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all" data-basemap="topo" onclick="switchBasemap('topo')" title="Curvas de Nível e Relevo Topográfico">
+          <button class="basemap-option px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all" data-basemap="topo" onclick="switchBasemap('topo')" title="Relevo Topográfico">
             <i class="fa-solid fa-mountain-sun"></i> Relevo
           </button>
         </div>
 
-        <!-- LEGENDA DINÂMICA FLUTUANTE (CANTO INFERIOR DIREITO) -->
-        <div id="dynamic-legend-box" class="absolute bottom-6 right-4 z-[500] map-floating-panel w-64 sm:w-72 overflow-hidden transition-all duration-300">
-          <div class="p-2.5 bg-slate-100/90 border-b border-slate-200 flex items-center justify-between cursor-pointer select-none" onclick="document.getElementById('legend-collapsible').classList.toggle('hidden')">
-            <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-              <i class="fa-solid fa-list-ul text-blue-600"></i> Legenda Dinâmica
-            </span>
-            <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
-          </div>
-          <div id="legend-collapsible" class="p-3 max-h-56 overflow-y-auto">
-            <div id="dynamic-legend-content">
-              <!-- Renderizado dinamicamente via js/map.js -->
+        <!-- ═══════════════════════════════════════════════════════
+             BOTÃO TOGGLE DO PAINEL DE CAMADAS (CANTO SUPERIOR DIREITO)
+             ═══════════════════════════════════════════════════════ -->
+        <button id="toggle-layers-panel-btn" onclick="toggleLayersPanel()"
+          style="position:absolute;top:12px;right:12px;z-index:810;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:none;cursor:pointer;font-size:16px;color:white;background:linear-gradient(135deg,#15803d,#22c55e);box-shadow:0 2px 10px rgba(21,128,61,.35);transition:all .2s;"
+          onmouseover="this.style.background='linear-gradient(135deg,#166534,#16a34a)';"
+          onmouseout="this.style.background='linear-gradient(135deg,#15803d,#22c55e)';"
+          title="Abrir/Fechar Painel de Camadas">
+          <i class="fa-solid fa-layer-group"></i>
+        </button>
+
+        <!-- ═══════════════════════════════════════════════════════
+             PAINEL FLUTUANTE DE CAMADAS (DIREITA) — ESTILO IMA/ARCGIS
+             ═══════════════════════════════════════════════════════ -->
+        <aside id="layers-panel" style="
+          position:absolute; top:0; right:0; bottom:0; width:320px;
+          background:white; z-index:800;
+          box-shadow:-4px 0 20px rgba(0,0,0,.12);
+          display:flex; flex-direction:column;
+          transform:translateX(0);
+          transition:transform .3s cubic-bezier(.4,0,.2,1);
+        ">
+
+          <!-- Cabeçalho do Painel de Camadas -->
+          <div style="padding:10px 14px;border-bottom:1px solid #e5e7eb;background:#f9fafb;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+            <div>
+              <h3 style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#374151;display:flex;align-items:center;gap:6px;margin:0;">
+                <i class="fa-solid fa-layer-group" style="color:#16a34a;"></i> Lista de Camadas
+              </h3>
+              <span style="font-size:0.62rem;color:#9ca3af;">Geoportal de Craíbas - AL</span>
             </div>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <button onclick="resetCraibasExtent()"
+                style="width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:6px;color:#6b7280;font-size:12px;display:flex;align-items:center;justify-content:center;"
+                onmouseover="this.style.background='#f0fdf4';this.style.color='#15803d';"
+                onmouseout="this.style.background='transparent';this.style.color='#6b7280';"
+                title="Enquadrar Craíbas">
+                <i class="fa-solid fa-compress"></i>
+              </button>
+              <button onclick="toggleLayersPanel()"
+                style="width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:6px;color:#6b7280;font-size:12px;display:flex;align-items:center;justify-content:center;"
+                onmouseover="this.style.background='#fee2e2';this.style.color='#dc2626';"
+                onmouseout="this.style.background='transparent';this.style.color='#6b7280';"
+                title="Fechar Painel">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Presets Temáticos Rápidos -->
+          <div style="padding:8px 12px;border-bottom:1px solid #f3f4f6;background:#f0fdf4;">
+            <span style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;display:block;margin-bottom:6px;">
+              <i class="fa-solid fa-bolt" style="color:#16a34a;margin-right:3px;"></i>Mapas Temáticos Rápidos:
+            </span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+              <button onclick="applyThematicPreset('geral')" class="preset-btn" style="padding:5px 8px;font-size:0.68rem;">
+                <i class="fa-solid fa-landmark" style="color:#16a34a;font-size:0.62rem;"></i> Visão Geral
+              </button>
+              <button onclick="applyThematicPreset('planejamento')" class="preset-btn" style="padding:5px 8px;font-size:0.68rem;">
+                <i class="fa-solid fa-draw-polygon" style="color:#16a34a;font-size:0.62rem;"></i> Zoneamento
+              </button>
+              <button onclick="applyThematicPreset('ambiental')" class="preset-btn" style="padding:5px 8px;font-size:0.68rem;">
+                <i class="fa-solid fa-leaf" style="color:#22c55e;font-size:0.62rem;"></i> Meio Ambiente
+              </button>
+              <button onclick="applyThematicPreset('social')" class="preset-btn" style="padding:5px 8px;font-size:0.68rem;">
+                <i class="fa-solid fa-users" style="color:#15803d;font-size:0.62rem;"></i> Censo
+              </button>
+            </div>
+          </div>
+
+          <!-- Busca + Filtros de Tipologia -->
+          <div style="padding:8px 12px;border-bottom:1px solid #f3f4f6;background:white;">
+            <div style="position:relative;margin-bottom:6px;">
+              <i class="fa-solid fa-filter" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:10px;"></i>
+              <input type="text" placeholder="Filtrar camadas..." oninput="filterLayersInTree(this.value)"
+                style="width:100%;padding:5px 8px 5px 24px;font-size:0.72rem;border:1px solid #e5e7eb;border-radius:7px;background:#f9fafb;outline:none;box-sizing:border-box;"
+                onfocus="this.style.borderColor='#22c55e';this.style.background='white';"
+                onblur="this.style.borderColor='#e5e7eb';this.style.background='#f9fafb';">
+            </div>
+            <!-- Pílulas de tipologia em wrap -->
+            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">
+              <button class="typology-pill-btn active" data-typ="all" onclick="filterByTypology('all')" style="font-size:0.62rem;padding:2px 8px;">Todas</button>
+              <button class="typology-pill-btn" data-typ="gestao_publica" onclick="filterByTypology('gestao_publica')" style="font-size:0.62rem;padding:2px 8px;">🏛️ Gestão</button>
+              <button class="typology-pill-btn" data-typ="limites_demografia" onclick="filterByTypology('limites_demografia')" style="font-size:0.62rem;padding:2px 8px;">🗺️ Limites</button>
+              <button class="typology-pill-btn" data-typ="sistema_viario" onclick="filterByTypology('sistema_viario')" style="font-size:0.62rem;padding:2px 8px;">🛣️ Viário</button>
+              <button class="typology-pill-btn" data-typ="zoneamento" onclick="filterByTypology('zoneamento')" style="font-size:0.62rem;padding:2px 8px;">🏙️ Zoneamento</button>
+              <button class="typology-pill-btn" data-typ="mineracao_solos" onclick="filterByTypology('mineracao_solos')" style="font-size:0.62rem;padding:2px 8px;">⛏️ Mineração</button>
+              <button class="typology-pill-btn" data-typ="hidrografia" onclick="filterByTypology('hidrografia')" style="font-size:0.62rem;padding:2px 8px;">💧 Hidro</button>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.68rem;">
+              <button onclick="enableAllLayers()" style="color:#15803d;font-weight:700;border:none;background:none;cursor:pointer;display:flex;align-items:center;gap:3px;">
+                <i class="fa-solid fa-check-double" style="font-size:10px;"></i> Ativar Todas
+              </button>
+              <button onclick="disableAllLayers()" style="color:#6b7280;font-weight:700;border:none;background:none;cursor:pointer;display:flex;align-items:center;gap:3px;">
+                <i class="fa-solid fa-ban" style="font-size:10px;"></i> Desativar Todas
+              </button>
+            </div>
+          </div>
+
+          <!-- Árvore de Camadas -->
+          <div id="layers-tree-container" style="flex:1;overflow-y:auto;"></div>
+
+          <!-- Rodapé do Painel -->
+          <div style="padding:8px 14px;border-top:1px solid #e5e7eb;background:#f0fdf4;display:flex;align-items:center;justify-content:space-between;font-size:0.68rem;color:#6b7280;flex-shrink:0;">
+            <span style="display:flex;align-items:center;gap:5px;">
+              <i class="fa-solid fa-compass" style="color:#16a34a;"></i> SIRGAS 2000
+            </span>
+            <button onclick="switchTab('downloads-tab')" style="color:#15803d;font-weight:700;border:none;background:none;cursor:pointer;display:flex;align-items:center;gap:4px;">
+              <i class="fa-solid fa-download" style="font-size:10px;"></i> Baixar Arquivos
+            </button>
+          </div>
+        </aside>
+
+        <!-- ═══════════════════════════════════════════════════════
+             LEGENDA DINÂMICA FLUTUANTE (CANTO INFERIOR ESQUERDO)
+             ═══════════════════════════════════════════════════════ -->
+        <div id="dynamic-legend-box" style="position:absolute;bottom:32px;left:12px;z-index:500;width:240px;" class="map-floating-panel overflow-hidden">
+          <div style="padding:8px 10px;background:rgba(248,250,252,.95);border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="document.getElementById('legend-collapsible').classList.toggle('hidden')">
+            <span style="font-size:0.72rem;font-weight:700;color:#1f2937;display:flex;align-items:center;gap:5px;">
+              <i class="fa-solid fa-list-ul" style="color:#16a34a;"></i> Legenda
+            </span>
+            <i class="fa-solid fa-chevron-down" style="font-size:10px;color:#9ca3af;"></i>
+          </div>
+          <div id="legend-collapsible" style="padding:8px 10px;max-height:200px;overflow-y:auto;">
+            <div id="dynamic-legend-content"></div>
           </div>
         </div>
 
         <!-- BARRA INFERIOR DE COORDENADAS E ESCALA -->
-        <div class="absolute bottom-2 left-4 z-[500] map-floating-panel px-3 py-1 text-[11px] text-slate-600 font-mono flex items-center gap-3">
+        <div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);z-index:500;" class="map-floating-panel px-3 py-1 text-[11px] text-slate-600 font-mono flex items-center gap-3">
           <span id="mouse-coordinates">Lat: -9.63989° | Lng: -36.79251° | Zoom: 12</span>
-          <span class="text-slate-300">|</span>
-          <span class="font-sans font-medium text-slate-700">Craíbas, AL</span>
+          <span style="color:#e5e7eb;">|</span>
+          <span style="font-family:Inter,sans-serif;font-weight:500;color:#374151;">Craíbas, AL</span>
         </div>
 
         <!-- GAVETA RETRÁTIL DA TABELA DE ATRIBUTOS -->
@@ -357,13 +383,13 @@
               </div>
               <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
                 <button class="filter-tab-pill active px-3 py-2 rounded-xl text-xs font-semibold bg-green-600 text-white flex items-center gap-1.5 whitespace-nowrap" data-filter="all">
-                  <i class="fa-solid fa-list-check"></i> Todos (30)
+                  <i class="fa-solid fa-list-check"></i> Todos (33)
                 </button>
                 <button class="filter-tab-pill px-3 py-2 rounded-xl text-xs font-semibold bg-gray-100 text-gray-600 flex items-center gap-1.5 whitespace-nowrap" data-filter="laws">
                   <i class="fa-solid fa-scale-balanced text-green-600"></i> Leis (6)
                 </button>
                 <button class="filter-tab-pill px-3 py-2 rounded-xl text-xs font-semibold bg-gray-100 text-gray-600 flex items-center gap-1.5 whitespace-nowrap" data-filter="maps">
-                  <i class="fa-solid fa-image text-green-600"></i> Mapas PNG (10)
+                  <i class="fa-solid fa-image text-green-600"></i> Mapas PNG (13)
                 </button>
                 <button class="filter-tab-pill px-3 py-2 rounded-xl text-xs font-semibold bg-gray-100 text-gray-600 flex items-center gap-1.5 whitespace-nowrap" data-filter="layers">
                   <i class="fa-solid fa-layer-group text-green-700"></i> Camadas SIG (14)
@@ -403,7 +429,7 @@
               <p class="text-xs text-slate-500">Cartografia temática oficial gerada para impressão e relatórios técnicos em alta definição.</p>
             </div>
             <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">
-              10 Pranchas Cartográficas
+              13 Pranchas Cartográficas
             </span>
           </div>
           <div id="maps-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

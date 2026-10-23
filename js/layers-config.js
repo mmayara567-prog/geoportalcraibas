@@ -561,12 +561,36 @@ const HIGH_RES_MAPS = [
     description: "Classes taxonômicas de solos (Latossolos, Planossolos, Neossolos) segundo classificação IBGE/CPRM."
   },
   {
-    id: "map_zoneamento",
-    title: "Mapa de Zoneamento Urbano e Rural - Craíbas-AL",
-    file: "MAPAS/MAPA - ZONEAMENTO - CRAÍBAS-AL.png",
-    size: "1.73 MB",
+    id: "map_zon_rural_2",
+    title: "Mapa de Zoneamento Rural e Ambiental - Craíbas-AL",
+    file: "MAPAS/MAPA - ZONEAMENTO RURAL E AMBIENTAL - CRAÍBAS-AL-21-10-2026_2.png",
+    size: "1.55 MB",
     category: "Planejamento Territorial",
-    description: "Mapa oficial de Zoneamento Urbano e Ambiental/Rural do Município de Craíbas - AL, com delimitação das zonas de uso e ocupação do solo conforme a legislação municipal."
+    description: "Mapa atualizado de Zoneamento Ambiental e Rural do Município de Craíbas - AL (21/10/2026), com delimitação das Zonas de Proteção Ambiental, Zonas Rurais e demais categorias de uso e ocupação do solo rural conforme a legislação municipal."
+  },
+  {
+    id: "map_zon_urb_02",
+    title: "Mapa de Zoneamento Urbano - Craíbas-AL (Folha 02)",
+    file: "MAPAS/MAPA - ZONEAMENTO URBANO - 02.png",
+    size: "1.16 MB",
+    category: "Planejamento Territorial",
+    description: "Prancha 02 do Zoneamento Urbano Municipal de Craíbas - AL, com delimitação das zonas de uso e ocupação do solo conforme a legislação municipal."
+  },
+  {
+    id: "map_zon_urb_central",
+    title: "Mapa de Zoneamento Urbano - Área Central",
+    file: "MAPAS/MAPA - ZONEAMENTO URBANO - CENTRAL 02.png",
+    size: "0.95 MB",
+    category: "Planejamento Territorial",
+    description: "Detalhe ampliado da área central do Zoneamento Urbano Municipal de Craíbas - AL, com identificação das zonas comerciais, residenciais e de serviços do núcleo urbano."
+  },
+  {
+    id: "map_zon_urb_miuda",
+    title: "Mapa de Zoneamento Urbano - Folha Miúda",
+    file: "MAPAS/MAPA - ZONEAMENTO URBANO - FOLHA MIÚDA 02.png",
+    size: "0.86 MB",
+    category: "Planejamento Territorial",
+    description: "Escala ampliada do Zoneamento Urbano Municipal de Craíbas - AL para análise de lotes e quarteirões, com maior detalhe das subdivisões territoriais."
   }
 ];
 

@@ -877,3 +877,26 @@ function exportCurrentTableToCSV() {
   link.click();
   document.body.removeChild(link);
 }
+
+// ─── Painel de Camadas Flutuante (estilo IMA) ─────────────────────────────────
+let _layersPanelOpen = true;
+
+function toggleLayersPanel() {
+  const panel = document.getElementById('layers-panel');
+  const btn   = document.getElementById('toggle-layers-panel-btn');
+  if (!panel) return;
+
+  _layersPanelOpen = !_layersPanelOpen;
+
+  if (_layersPanelOpen) {
+    panel.style.transform = 'translateX(0)';
+    if (btn) btn.title = 'Fechar Painel de Camadas';
+  } else {
+    panel.style.transform = 'translateX(100%)';
+    if (btn) btn.title = 'Abrir Painel de Camadas';
+  }
+
+  // Re-renderiza o Leaflet após a animação CSS (300 ms)
+  setTimeout(() => { if (map) map.invalidateSize(); }, 320);
+}
+

@@ -246,12 +246,9 @@ function setupDownloadFilters() {
 
   document.querySelectorAll('.filter-tab-pill').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-tab-pill').forEach(b => {
-        b.classList.remove('active', 'bg-blue-600', 'text-white');
-        b.classList.add('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
-      });
-      btn.classList.add('active', 'bg-blue-600', 'text-white');
-      btn.classList.remove('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+      // Remove active de todos, adiciona apenas no clicado
+      document.querySelectorAll('.filter-tab-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
       currentFilter = btn.dataset.filter;
       refreshAllDownloads();
