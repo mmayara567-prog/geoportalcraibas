@@ -299,17 +299,18 @@ html, body {
 .layer-action-link.muted:hover { color: var(--gray-800); }
 
 /* ════════════════════════════════════════════════════════════
-   PAINEL DE CAMADAS — ESTILO IMA / ARCGIS WEBAPP VIEWER
+   PAINEL DE CAMADAS — ESTILO IMA / ARCGIS (PALETA VERDE AO BRANCO)
 ════════════════════════════════════════════════════════════ */
 .ima-panel-header {
-  height: 42px;
-  background: #004b56;
+  height: 44px;
+  background: linear-gradient(135deg, #14532d, #166534);
   color: #ffffff;
   padding: 0 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
+  border-bottom: 2px solid #22c55e;
 }
 .ima-panel-title {
   font-size: 0.95rem;
@@ -334,10 +335,11 @@ html, body {
   align-items: center;
   justify-content: center;
   opacity: 0.9;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, transform 0.15s;
 }
 .ima-panel-icon-btn:hover {
   opacity: 1;
+  transform: scale(1.1);
 }
 
 .ima-sub-header {
@@ -347,13 +349,13 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid #e2e8f0;
   flex-shrink: 0;
 }
 .ima-sub-title {
   font-size: 0.875rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #14532d;
 }
 .ima-sub-actions {
   display: flex;
@@ -370,7 +372,7 @@ html, body {
   transition: color 0.15s;
 }
 .ima-sub-icon-btn:hover {
-  color: #0f172a;
+  color: #16a34a;
 }
 
 /* Árvore de Camadas */
@@ -391,14 +393,14 @@ html, body {
   cursor: pointer;
   user-select: none;
   transition: background 0.12s;
-  border-radius: 2px;
+  border-radius: 4px;
   margin: 1px 4px;
 }
 .ima-tree-row:hover {
-  background: #f1f5f9;
+  background: #f0fdf4;
 }
 .ima-tree-row.selected {
-  background: #e2e8f0;
+  background: #dcfce7;
 }
 
 .ima-row-main {
@@ -414,7 +416,7 @@ html, body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #94a3b8;
+  color: #9ca3af;
   font-size: 9px;
   cursor: pointer;
   flex-shrink: 0;
@@ -422,12 +424,13 @@ html, body {
 }
 .ima-tree-caret.expanded {
   transform: rotate(90deg);
+  color: #16a34a;
 }
 
 .ima-tree-checkbox {
   width: 15px;
   height: 15px;
-  accent-color: #00838f;
+  accent-color: #16a34a;
   cursor: pointer;
   flex-shrink: 0;
   margin: 0;
@@ -442,21 +445,22 @@ html, body {
   min-width: 0;
 }
 .ima-group-label {
-  font-weight: 500;
-  color: #0f172a;
+  font-weight: 600;
+  color: #1f2937;
 }
 .ima-layer-label {
-  font-weight: 400;
-  color: #1e293b;
+  font-weight: 500;
+  color: #374151;
 }
 .ima-layer-label.muted {
-  color: #94a3b8;
+  color: #9ca3af;
+  font-weight: 400;
 }
 
 .ima-dots-btn {
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: #9ca3af;
   font-size: 15px;
   cursor: pointer;
   padding: 2px 6px;
@@ -470,8 +474,8 @@ html, body {
   letter-spacing: 1px;
 }
 .ima-dots-btn:hover {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: #dcfce7;
+  color: #15803d;
 }
 
 .ima-tree-children {
@@ -488,9 +492,9 @@ html, body {
 .ima-context-popover {
   position: absolute;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.18), 0 8px 10px -6px rgba(0,0,0,0.1);
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(20,83,45,0.12), 0 8px 10px -6px rgba(20,83,45,0.06);
   z-index: 1200;
   min-width: 200px;
   padding: 4px 0;
@@ -504,32 +508,32 @@ html, body {
   gap: 8px;
   font-size: 0.75rem;
   font-weight: 500;
-  color: #334155;
+  color: #374151;
   border: none;
   background: transparent;
   cursor: pointer;
   text-align: left;
-  transition: background 0.1s;
+  transition: background 0.1s, color 0.1s;
 }
 .ima-context-popover button:hover {
-  background: #f1f5f9;
-  color: #0f172a;
+  background: #f0fdf4;
+  color: #15803d;
 }
 .ima-context-popover button i {
-  color: #64748b;
+  color: #16a34a;
   width: 14px;
   text-align: center;
   font-size: 0.75rem;
 }
 .ima-popover-divider {
   height: 1px;
-  background: #f1f5f9;
+  background: #dcfce7;
   margin: 4px 0;
 }
 .ima-popover-slider-row {
   padding: 6px 12px;
   font-size: 0.72rem;
-  color: #64748b;
+  color: #4b5563;
 }
 
 /* ════════════════════════════════════════════════════════════

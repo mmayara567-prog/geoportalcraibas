@@ -463,19 +463,19 @@ function openLayerContextMenu(event, layerId) {
 
   popover.innerHTML = `
     <button onclick="zoomToLayer('${layerId}'); closeAllContextMenus();">
-      <i class="fa-solid fa-expand"></i> Zoom para a camada
+      <i class="fa-solid fa-expand" style="color:#16a34a;"></i> Zoom para a camada
     </button>
     <button onclick="openAttributeTable('${layerId}'); closeAllContextMenus();">
-      <i class="fa-solid fa-table"></i> Tabela de atributos
+      <i class="fa-solid fa-table" style="color:#16a34a;"></i> Tabela de atributos
     </button>
     <div class="ima-popover-divider"></div>
     <div class="ima-popover-slider-row">
       <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-        <span>Opacidade:</span>
-        <span id="opacity-val-${layerId}" style="font-weight:700;">${currentOpacity}%</span>
+        <span style="color:#374151;font-weight:600;">Opacidade:</span>
+        <span id="opacity-val-${layerId}" style="font-weight:700;color:#16a34a;">${currentOpacity}%</span>
       </div>
       <input type="range" min="0" max="100" value="${currentOpacity}" class="opacity-slider"
-        style="width:100%;height:4px;accent-color:#00838f;cursor:pointer;"
+        style="width:100%;height:4px;accent-color:#16a34a;cursor:pointer;"
         oninput="
           changeLayerOpacity('${layerId}', this.value);
           document.getElementById('opacity-val-${layerId}').textContent = this.value + '%';
@@ -483,7 +483,7 @@ function openLayerContextMenu(event, layerId) {
     </div>
     <div class="ima-popover-divider"></div>
     <button onclick="switchTab('downloads-tab'); closeAllContextMenus();">
-      <i class="fa-solid fa-download"></i> Baixar dados desta camada
+      <i class="fa-solid fa-download" style="color:#16a34a;"></i> Baixar dados desta camada
     </button>
   `;
 
@@ -508,7 +508,7 @@ function openGroupContextMenu(event, typId) {
     </button>
     <div class="ima-popover-divider"></div>
     <button onclick="zoomToGroup('${typId}'); closeAllContextMenus();">
-      <i class="fa-solid fa-expand" style="color:#0284c7;"></i> Zoom na extensão do grupo
+      <i class="fa-solid fa-expand" style="color:#16a34a;"></i> Zoom na extensão do grupo
     </button>
   `;
 
