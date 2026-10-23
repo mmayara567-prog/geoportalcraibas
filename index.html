@@ -193,10 +193,8 @@
              BOTÃO TOGGLE DO PAINEL DE CAMADAS (CANTO SUPERIOR DIREITO)
              ═══════════════════════════════════════════════════════ -->
         <button id="toggle-layers-panel-btn" onclick="toggleLayersPanel()"
-          style="position:absolute;top:12px;right:12px;z-index:810;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:none;cursor:pointer;font-size:16px;color:white;background:linear-gradient(135deg,#15803d,#22c55e);box-shadow:0 2px 10px rgba(21,128,61,.35);transition:all .2s;"
-          onmouseover="this.style.background='linear-gradient(135deg,#166534,#16a34a)';"
-          onmouseout="this.style.background='linear-gradient(135deg,#15803d,#22c55e)';"
-          title="Abrir/Fechar Painel de Camadas">
+          style="display:none;position:absolute;top:12px;right:12px;z-index:700;width:40px;height:40px;align-items:center;justify-content:center;border-radius:10px;border:none;cursor:pointer;font-size:16px;color:white;background:linear-gradient(135deg,#004b56,#00838f);box-shadow:0 2px 10px rgba(0,75,86,.4);transition:all .2s;"
+          title="Abrir Lista de Camada">
           <i class="fa-solid fa-layer-group"></i>
         </button>
 
@@ -204,102 +202,67 @@
              PAINEL FLUTUANTE DE CAMADAS (DIREITA) — ESTILO IMA/ARCGIS
              ═══════════════════════════════════════════════════════ -->
         <aside id="layers-panel" style="
-          position:absolute; top:0; right:0; bottom:0; width:320px;
+          position:absolute; top:0; right:0; bottom:0; width:330px;
           background:white; z-index:800;
-          box-shadow:-4px 0 20px rgba(0,0,0,.12);
+          box-shadow:-4px 0 20px rgba(0,0,0,.15);
           display:flex; flex-direction:column;
           transform:translateX(0);
           transition:transform .3s cubic-bezier(.4,0,.2,1);
         ">
 
-          <!-- Cabeçalho do Painel de Camadas -->
-          <div style="padding:10px 14px;border-bottom:1px solid #e5e7eb;background:#f9fafb;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-            <div>
-              <h3 style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#374151;display:flex;align-items:center;gap:6px;margin:0;">
-                <i class="fa-solid fa-layer-group" style="color:#16a34a;"></i> Lista de Camadas
-              </h3>
-              <span style="font-size:0.62rem;color:#9ca3af;">Geoportal de Craíbas - AL</span>
-            </div>
-            <div style="display:flex;gap:4px;align-items:center;">
-              <button onclick="resetCraibasExtent()"
-                style="width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:6px;color:#6b7280;font-size:12px;display:flex;align-items:center;justify-content:center;"
-                onmouseover="this.style.background='#f0fdf4';this.style.color='#15803d';"
-                onmouseout="this.style.background='transparent';this.style.color='#6b7280';"
-                title="Enquadrar Craíbas">
-                <i class="fa-solid fa-compress"></i>
+          <!-- 1. Cabeçalho Petrol: "Lista de Camada" (Estilo IMA) -->
+          <div class="ima-panel-header">
+            <h3 class="ima-panel-title">Lista de Camada</h3>
+            <div class="ima-panel-actions">
+              <button class="ima-panel-icon-btn" onclick="toggleAllGroupsCollapse()" title="Recolher / Expandir Tudo">
+                <i id="panel-collapse-icon" class="fa-solid fa-angles-up"></i>
               </button>
-              <button onclick="toggleLayersPanel()"
-                style="width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:6px;color:#6b7280;font-size:12px;display:flex;align-items:center;justify-content:center;"
-                onmouseover="this.style.background='#fee2e2';this.style.color='#dc2626';"
-                onmouseout="this.style.background='transparent';this.style.color='#6b7280';"
-                title="Fechar Painel">
+              <button class="ima-panel-icon-btn" onclick="toggleLayersPanel()" title="Fechar Lista de Camada">
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
           </div>
 
-          <!-- Presets Temáticos Rápidos -->
-          <div style="padding:8px 12px;border-bottom:1px solid #f3f4f6;background:#f0fdf4;">
-            <span style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;display:block;margin-bottom:6px;">
-              <i class="fa-solid fa-bolt" style="color:#16a34a;margin-right:3px;"></i>Mapas Temáticos Rápidos:
-            </span>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
-              <button onclick="applyThematicPreset('geral')" class="preset-btn" style="padding:5px 8px;font-size:0.68rem;">
-                <i class="fa-solid fa-landmark" style="color:#16a34a;font-size:0.62rem;"></i> Visão Geral
+          <!-- 2. Sub-cabeçalho: "Camadas" + Busca + Menu de Opções -->
+          <div class="ima-sub-header">
+            <span class="ima-sub-title">Camadas</span>
+            <div class="ima-sub-actions">
+              <button class="ima-sub-icon-btn" onclick="toggleTreeSearchInput()" title="Pesquisar camadas">
+                <i class="fa-solid fa-magnifying-glass"></i>
               </button>
-              <button onclick="applyThematicPreset('planejamento')" class="preset-btn" style="padding:5px 8px;font-size:0.68rem;">
-                <i class="fa-solid fa-draw-polygon" style="color:#16a34a;font-size:0.62rem;"></i> Zoneamento
-              </button>
-              <button onclick="applyThematicPreset('ambiental')" class="preset-btn" style="padding:5px 8px;font-size:0.68rem;">
-                <i class="fa-solid fa-leaf" style="color:#22c55e;font-size:0.62rem;"></i> Meio Ambiente
-              </button>
-              <button onclick="applyThematicPreset('social')" class="preset-btn" style="padding:5px 8px;font-size:0.68rem;">
-                <i class="fa-solid fa-users" style="color:#15803d;font-size:0.62rem;"></i> Censo
+              <button class="ima-sub-icon-btn" onclick="toggleTreeOptionsMenu(event)" title="Opções de visualização">
+                <i class="fa-solid fa-bars-staggered"></i>
               </button>
             </div>
           </div>
 
-          <!-- Busca + Filtros de Tipologia -->
-          <div style="padding:8px 12px;border-bottom:1px solid #f3f4f6;background:white;">
-            <div style="position:relative;margin-bottom:6px;">
-              <i class="fa-solid fa-filter" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:10px;"></i>
-              <input type="text" placeholder="Filtrar camadas..." oninput="filterLayersInTree(this.value)"
-                style="width:100%;padding:5px 8px 5px 24px;font-size:0.72rem;border:1px solid #e5e7eb;border-radius:7px;background:#f9fafb;outline:none;box-sizing:border-box;"
-                onfocus="this.style.borderColor='#22c55e';this.style.background='white';"
-                onblur="this.style.borderColor='#e5e7eb';this.style.background='#f9fafb';">
-            </div>
-            <!-- Pílulas de tipologia em wrap -->
-            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">
-              <button class="typology-pill-btn active" data-typ="all" onclick="filterByTypology('all')" style="font-size:0.62rem;padding:2px 8px;">Todas</button>
-              <button class="typology-pill-btn" data-typ="gestao_publica" onclick="filterByTypology('gestao_publica')" style="font-size:0.62rem;padding:2px 8px;">🏛️ Gestão</button>
-              <button class="typology-pill-btn" data-typ="limites_demografia" onclick="filterByTypology('limites_demografia')" style="font-size:0.62rem;padding:2px 8px;">🗺️ Limites</button>
-              <button class="typology-pill-btn" data-typ="sistema_viario" onclick="filterByTypology('sistema_viario')" style="font-size:0.62rem;padding:2px 8px;">🛣️ Viário</button>
-              <button class="typology-pill-btn" data-typ="zoneamento" onclick="filterByTypology('zoneamento')" style="font-size:0.62rem;padding:2px 8px;">🏙️ Zoneamento</button>
-              <button class="typology-pill-btn" data-typ="mineracao_solos" onclick="filterByTypology('mineracao_solos')" style="font-size:0.62rem;padding:2px 8px;">⛏️ Mineração</button>
-              <button class="typology-pill-btn" data-typ="hidrografia" onclick="filterByTypology('hidrografia')" style="font-size:0.62rem;padding:2px 8px;">💧 Hidro</button>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:0.68rem;">
-              <button onclick="enableAllLayers()" style="color:#15803d;font-weight:700;border:none;background:none;cursor:pointer;display:flex;align-items:center;gap:3px;">
-                <i class="fa-solid fa-check-double" style="font-size:10px;"></i> Ativar Todas
-              </button>
-              <button onclick="disableAllLayers()" style="color:#6b7280;font-weight:700;border:none;background:none;cursor:pointer;display:flex;align-items:center;gap:3px;">
-                <i class="fa-solid fa-ban" style="font-size:10px;"></i> Desativar Todas
-              </button>
-            </div>
+          <!-- Barra retrátil de pesquisa rápida -->
+          <div id="ima-search-bar" style="display:none;padding:6px 12px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+            <input type="text" id="ima-filter-input" placeholder="Filtrar camadas..." oninput="filterLayersInTree(this.value)"
+              style="width:100%;padding:5px 8px;font-size:0.75rem;border:1px solid #cbd5e1;border-radius:4px;outline:none;background:#ffffff;">
           </div>
 
-          <!-- Árvore de Camadas -->
-          <div id="layers-tree-container" style="flex:1;overflow-y:auto;"></div>
-
-          <!-- Rodapé do Painel -->
-          <div style="padding:8px 14px;border-top:1px solid #e5e7eb;background:#f0fdf4;display:flex;align-items:center;justify-content:space-between;font-size:0.68rem;color:#6b7280;flex-shrink:0;">
-            <span style="display:flex;align-items:center;gap:5px;">
-              <i class="fa-solid fa-compass" style="color:#16a34a;"></i> SIRGAS 2000
-            </span>
-            <button onclick="switchTab('downloads-tab')" style="color:#15803d;font-weight:700;border:none;background:none;cursor:pointer;display:flex;align-items:center;gap:4px;">
-              <i class="fa-solid fa-download" style="font-size:10px;"></i> Baixar Arquivos
-            </button>
+          <!-- Menu Dropdown de Opções Globais -->
+          <div id="ima-options-dropdown" class="ima-context-popover" style="right:12px;top:80px;">
+            <button onclick="enableAllLayers()"><i class="fa-solid fa-check-double" style="color:#059669;"></i> Ativar todas as camadas</button>
+            <button onclick="disableAllLayers()"><i class="fa-solid fa-ban" style="color:#64748b;"></i> Desativar todas as camadas</button>
+            <div class="ima-popover-divider"></div>
+            <button onclick="expandAllGroups()"><i class="fa-solid fa-folder-open" style="color:#0284c7;"></i> Expandir todos os grupos</button>
+            <button onclick="collapseAllGroups()"><i class="fa-solid fa-folder" style="color:#0284c7;"></i> Recolher todos os grupos</button>
+            <div class="ima-popover-divider"></div>
+            <div style="padding:4px 12px;font-size:0.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;">Mapas Rápidos:</div>
+            <button onclick="applyThematicPreset('planejamento')"><i class="fa-solid fa-draw-polygon" style="color:#059669;"></i> Zoneamento</button>
+            <button onclick="applyThematicPreset('ambiental')"><i class="fa-solid fa-leaf" style="color:#16a34a;"></i> Meio Ambiente</button>
+            <button onclick="applyThematicPreset('geral')"><i class="fa-solid fa-landmark" style="color:#2563eb;"></i> Visão Geral</button>
+            <button onclick="applyThematicPreset('social')"><i class="fa-solid fa-users" style="color:#4f46e5;"></i> Demografia Censo</button>
           </div>
+
+          <!-- 3. Árvore de Camadas Renderizada via JS (idêntica ao print) -->
+          <div id="layers-tree-container"></div>
+
+          <!-- Menu de Contexto Flutuante para os botões "..." -->
+          <div id="ima-context-menu" class="ima-context-popover"></div>
+
         </aside>
 
         <!-- ═══════════════════════════════════════════════════════

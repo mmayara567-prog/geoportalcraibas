@@ -190,6 +190,7 @@ function loadGeoLayers() {
   });
 
   updateActiveLayerCount();
+  MAP_TYPOLOGIES.forEach(typ => updateGroupCheckboxState(typ.id));
 }
 
 // Criação do conteúdo dos Popups
@@ -238,7 +239,12 @@ function buildPopupContent(feature, cfg) {
   `;
 }
 
-// Renderização da Árvore de Camadas por Tipologia
+// ══════════════════════════════════════════════════════════════════════════════
+// RENDERIZAÇÃO DA ÁRVORE DE CAMADAS — ESTILO IMA / ARCGIS WEBAPP VIEWER
+// ══════════════════════════════════════════════════════════════════════════════
+
+let allGroupsCollapsedState = false;
+
 function renderLayerTree() {
   const container = document.getElementById('layers-tree-container');
   if (!container) return;
@@ -246,122 +252,400 @@ function renderLayerTree() {
   container.innerHTML = '';
 
   MAP_TYPOLOGIES.forEach(typ => {
-    if (activeTypologyFilter !== 'all' && activeTypologyFilter !== typ.id) return;
-
     const layersInTypology = LAYERS_CONFIG.filter(l => l.typology === typ.id);
     if (layersInTypology.length === 0) return;
 
-    const typSection = document.createElement('div');
-    typSection.className = 'typology-section';
-    typSection.dataset.typology = typ.id;
+    // Seção do grupo
+    const groupSection = document.createElement('div');
+    groupSection.className = 'ima-group-section';
+    groupSection.id = `ima-group-${typ.id}`;
 
-    const header = document.createElement('div');
-    header.className = 'typology-header';
-    header.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:${typ.color};flex-shrink:0;">
-          <i class="fa-solid ${typ.icon}" style="color:#fff;font-size:0.7rem"></i>
-        </div>
-        <div>
-          <div style="font-size:0.75rem;font-weight:700;color:#1f2937">${typ.title}</div>
-          <div style="font-size:0.65rem;color:#9ca3af">${layersInTypology.length} camada(s)</div>
-        </div>
+    // Linha do grupo (estilo IMA: caret + checkbox + título + ...)
+    const groupRow = document.createElement('div');
+    groupRow.className = 'ima-tree-row';
+    groupRow.id = `group-row-${typ.id}`;
+
+    // Determina se o grupo começa aberto
+    const isDefaultOpen = (typ.id === 'zoneamento' || typ.id === 'gestao_publica' || typ.id === 'hidrografia');
+
+    groupRow.innerHTML = `
+      <div class="ima-row-main" onclick="toggleGroupAccordion('${typ.id}')">
+        <span class="ima-tree-caret ${isDefaultOpen ? 'expanded' : ''}" id="caret-${typ.id}">
+          <i class="fa-solid fa-caret-right"></i>
+        </span>
+        <input type="checkbox" class="ima-tree-checkbox" id="chk-group-${typ.id}"
+          onclick="event.stopPropagation(); toggleGroupCheckbox('${typ.id}', this.checked)">
+        <span class="ima-tree-label ima-group-label" title="${typ.title}">${typ.title}</span>
       </div>
-      <i class="fa-solid fa-chevron-down typ-arrow" style="font-size:0.65rem;color:#9ca3af;transition:transform .2s"></i>
+      <button class="ima-dots-btn" onclick="event.stopPropagation(); openGroupContextMenu(event, '${typ.id}')" title="Opções do grupo">
+        <i class="fa-solid fa-ellipsis"></i>
+      </button>
     `;
 
-    const body = document.createElement('div');
-    body.className = 'typology-body hidden';
-    body.style.cssText = 'padding:6px 10px 10px;display:none';
+    // Container de sub-camadas
+    const childrenContainer = document.createElement('div');
+    childrenContainer.className = `ima-tree-children ${isDefaultOpen ? 'open' : ''}`;
+    childrenContainer.id = `children-${typ.id}`;
 
     layersInTypology.forEach(l => {
-      const card = document.createElement('div');
-      card.className = 'layer-card';
-      card.id = `layer-card-${l.id}`;
+      const childRow = document.createElement('div');
+      childRow.className = 'ima-tree-row ima-child-row';
+      childRow.id = `layer-row-${l.id}`;
+      childRow.onclick = () => highlightTreeRow(`layer-row-${l.id}`);
 
-      let swatch = `<span style="width:13px;height:13px;border-radius:50%;border:1px solid #d1d5db;background:${l.style?.color || l.pointColor || '#16a34a'};display:inline-block;flex-shrink:0"></span>`;
-      if (l.geomType === 'Point') {
-        swatch = `<i class="fa-solid ${l.pointIcon || 'fa-location-dot'}" style="color:${l.pointColor || '#dc2626'};font-size:0.8rem;flex-shrink:0"></i>`;
-      } else if (l.geomType === 'LineString') {
-        swatch = `<span style="width:18px;height:3px;border-radius:2px;background:${l.style?.color || '#dc2626'};display:inline-block;flex-shrink:0"></span>`;
-      }
+      const isChecked = l.visibleDefault;
 
-      card.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
-          <label style="display:flex;align-items:center;gap:7px;cursor:pointer;flex:1;min-width:0">
-            <input type="checkbox" id="chk-${l.id}" ${l.visibleDefault ? 'checked' : ''}
-              style="width:14px;height:14px;accent-color:#16a34a;cursor:pointer;flex-shrink:0"
-              onchange="toggleLayer('${l.id}')">
-            <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
-              ${swatch}
-              <span style="font-size:0.73rem;font-weight:600;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${l.name}">${l.name}</span>
-            </div>
-          </label>
-          <span style="font-size:0.65rem;font-weight:600;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:99px;padding:1px 7px;flex-shrink:0">${l.featureCount}</span>
+      childRow.innerHTML = `
+        <div class="ima-row-main">
+          <span class="ima-tree-caret" style="font-size:7px;opacity:0.5;">
+            <i class="fa-solid fa-play"></i>
+          </span>
+          <input type="checkbox" class="ima-tree-checkbox" id="chk-${l.id}" ${isChecked ? 'checked' : ''}
+            onclick="event.stopPropagation(); onLayerCheckboxChange('${l.id}')">
+          <span class="ima-tree-label ima-layer-label ${isChecked ? '' : 'muted'}" id="label-${l.id}" title="${l.name}">
+            ${l.name}
+          </span>
         </div>
-        <div style="margin-top:7px;padding-top:6px;border-top:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;gap:8px">
-          <div style="display:flex;align-items:center;gap:6px;flex:1">
-            <i class="fa-solid fa-circle-half-stroke" style="font-size:0.6rem;color:#9ca3af"></i>
-            <input type="range" min="0" max="100" value="100" class="opacity-slider"
-              oninput="changeLayerOpacity('${l.id}', this.value)">
-          </div>
-          <div style="display:flex;align-items:center;gap:2px">
-            <button onclick="zoomToLayer('${l.id}')"
-              style="padding:4px 6px;border:none;background:transparent;cursor:pointer;color:#9ca3af;border-radius:5px;font-size:0.7rem;transition:color .12s"
-              onmouseover="this.style.color='#16a34a';this.style.background='#f0fdf4'"
-              onmouseout="this.style.color='#9ca3af';this.style.background='transparent'"
-              title="Zoom para a camada">
-              <i class="fa-solid fa-expand"></i>
-            </button>
-            <button onclick="openAttributeTable('${l.id}')"
-              style="padding:4px 6px;border:none;background:transparent;cursor:pointer;color:#9ca3af;border-radius:5px;font-size:0.7rem;transition:color .12s"
-              onmouseover="this.style.color='#16a34a';this.style.background='#f0fdf4'"
-              onmouseout="this.style.color='#9ca3af';this.style.background='transparent'"
-              title="Tabela de Atributos">
-              <i class="fa-solid fa-table"></i>
-            </button>
-          </div>
-        </div>
+        <button class="ima-dots-btn" onclick="event.stopPropagation(); openLayerContextMenu(event, '${l.id}')" title="Opções da camada">
+          <i class="fa-solid fa-ellipsis"></i>
+        </button>
       `;
 
-      body.appendChild(card);
+      childrenContainer.appendChild(childRow);
     });
 
-    header.addEventListener('click', () => {
-      const isHidden = body.style.display === 'none' || body.style.display === '';
-      body.style.display = isHidden ? 'block' : 'none';
-      header.querySelector('.typ-arrow').style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-    });
+    groupSection.appendChild(groupRow);
+    groupSection.appendChild(childrenContainer);
+    container.appendChild(groupSection);
 
-    // Grupos abertos por padrão
-    if (typ.id === 'gestao_publica' || typ.id === 'limites_demografia' || typ.id === 'zoneamento') {
-      body.style.display = 'block';
-      setTimeout(() => {
-        const arrow = header.querySelector('.typ-arrow');
-        if (arrow) arrow.style.transform = 'rotate(180deg)';
-      }, 0);
+    // Atualiza estado inicial do checkbox do grupo
+    updateGroupCheckboxState(typ.id);
+  });
+}
+
+// Destaque visual suave da linha selecionada (estilo do print: "Fiscalizacao ambiental")
+function highlightTreeRow(rowId) {
+  document.querySelectorAll('.ima-tree-row').forEach(r => r.classList.remove('selected'));
+  const el = document.getElementById(rowId);
+  if (el) el.classList.add('selected');
+}
+
+// Expandir / Recolher Acordeão do Grupo
+function toggleGroupAccordion(typId) {
+  const children = document.getElementById(`children-${typId}`);
+  const caret = document.getElementById(`caret-${typId}`);
+  if (!children) return;
+
+  const isOpen = children.classList.contains('open');
+  if (isOpen) {
+    children.classList.remove('open');
+    if (caret) caret.classList.remove('expanded');
+  } else {
+    children.classList.add('open');
+    if (caret) caret.classList.add('expanded');
+  }
+}
+
+// Alternar todos os grupos de uma vez (botão do cabeçalho ^)
+function toggleAllGroupsCollapse() {
+  allGroupsCollapsedState = !allGroupsCollapsedState;
+  const icon = document.getElementById('panel-collapse-icon');
+
+  MAP_TYPOLOGIES.forEach(typ => {
+    const children = document.getElementById(`children-${typ.id}`);
+    const caret = document.getElementById(`caret-${typ.id}`);
+    if (children) {
+      if (allGroupsCollapsedState) {
+        children.classList.remove('open');
+        if (caret) caret.classList.remove('expanded');
+      } else {
+        children.classList.add('open');
+        if (caret) caret.classList.add('expanded');
+      }
     }
+  });
 
-    typSection.appendChild(header);
-    typSection.appendChild(body);
-    container.appendChild(typSection);
+  if (icon) {
+    icon.className = allGroupsCollapsedState ? 'fa-solid fa-angles-down' : 'fa-solid fa-angles-up';
+  }
+}
+
+function expandAllGroups() {
+  MAP_TYPOLOGIES.forEach(typ => {
+    const children = document.getElementById(`children-${typ.id}`);
+    const caret = document.getElementById(`caret-${typ.id}`);
+    if (children) children.classList.add('open');
+    if (caret) caret.classList.add('expanded');
+  });
+  closeAllContextMenus();
+}
+
+function collapseAllGroups() {
+  MAP_TYPOLOGIES.forEach(typ => {
+    const children = document.getElementById(`children-${typ.id}`);
+    const caret = document.getElementById(`caret-${typ.id}`);
+    if (children) children.classList.remove('open');
+    if (caret) caret.classList.remove('expanded');
+  });
+  closeAllContextMenus();
+}
+
+// Clique no checkbox do grupo (ativa/desativa todas as camadas filhas)
+function toggleGroupCheckbox(typId, isChecked) {
+  const layersInTyp = LAYERS_CONFIG.filter(l => l.typology === typId);
+  layersInTyp.forEach(l => {
+    const chk = document.getElementById(`chk-${l.id}`);
+    if (chk) {
+      chk.checked = isChecked;
+      const label = document.getElementById(`label-${l.id}`);
+      if (label) {
+        label.classList.toggle('muted', !isChecked);
+      }
+      toggleLayer(l.id);
+    }
   });
 }
 
-// Filtro rápido por tipologia
-function filterByTypology(typologyId) {
-  activeTypologyFilter = typologyId;
-  document.querySelectorAll('.typology-pill-btn').forEach(b => {
-    const isActive = b.dataset.typ === typologyId;
-    b.classList.toggle('active', isActive);
+// Atualizar estado do checkbox do grupo (checked, unchecked ou indeterminate)
+function updateGroupCheckboxState(typId) {
+  const groupChk = document.getElementById(`chk-group-${typId}`);
+  if (!groupChk) return;
+
+  const layersInTyp = LAYERS_CONFIG.filter(l => l.typology === typId);
+  if (layersInTyp.length === 0) return;
+
+  let checkedCount = 0;
+  layersInTyp.forEach(l => {
+    const chk = document.getElementById(`chk-${l.id}`);
+    if (chk && chk.checked) checkedCount++;
   });
-  renderLayerTree();
+
+  if (checkedCount === 0) {
+    groupChk.checked = false;
+    groupChk.indeterminate = false;
+  } else if (checkedCount === layersInTyp.length) {
+    groupChk.checked = true;
+    groupChk.indeterminate = false;
+  } else {
+    groupChk.checked = false;
+    groupChk.indeterminate = true;
+  }
 }
+
+// Alteração de checkbox individual da camada
+function onLayerCheckboxChange(layerId) {
+  const chk = document.getElementById(`chk-${layerId}`);
+  const label = document.getElementById(`label-${layerId}`);
+  if (!chk) return;
+
+  if (label) {
+    label.classList.toggle('muted', !chk.checked);
+  }
+
+  toggleLayer(layerId);
+
+  const cfg = LAYERS_CONFIG.find(l => l.id === layerId);
+  if (cfg) {
+    updateGroupCheckboxState(cfg.typology);
+  }
+}
+
+// Menu de Contexto para Camada Individual (...)
+function openLayerContextMenu(event, layerId) {
+  closeAllContextMenus();
+  const cfg = LAYERS_CONFIG.find(l => l.id === layerId);
+  if (!cfg) return;
+
+  const popover = document.getElementById('ima-context-menu');
+  if (!popover) return;
+
+  const currentOpacity = layerOpacities[layerId] !== undefined ? Math.round(layerOpacities[layerId] * 100) : 100;
+
+  popover.innerHTML = `
+    <button onclick="zoomToLayer('${layerId}'); closeAllContextMenus();">
+      <i class="fa-solid fa-expand"></i> Zoom para a camada
+    </button>
+    <button onclick="openAttributeTable('${layerId}'); closeAllContextMenus();">
+      <i class="fa-solid fa-table"></i> Tabela de atributos
+    </button>
+    <div class="ima-popover-divider"></div>
+    <div class="ima-popover-slider-row">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+        <span>Opacidade:</span>
+        <span id="opacity-val-${layerId}" style="font-weight:700;">${currentOpacity}%</span>
+      </div>
+      <input type="range" min="0" max="100" value="${currentOpacity}" class="opacity-slider"
+        style="width:100%;height:4px;accent-color:#00838f;cursor:pointer;"
+        oninput="
+          changeLayerOpacity('${layerId}', this.value);
+          document.getElementById('opacity-val-${layerId}').textContent = this.value + '%';
+        ">
+    </div>
+    <div class="ima-popover-divider"></div>
+    <button onclick="switchTab('downloads-tab'); closeAllContextMenus();">
+      <i class="fa-solid fa-download"></i> Baixar dados desta camada
+    </button>
+  `;
+
+  positionPopover(popover, event.currentTarget);
+}
+
+// Menu de Contexto para o Grupo (...)
+function openGroupContextMenu(event, typId) {
+  closeAllContextMenus();
+  const typ = MAP_TYPOLOGIES.find(t => t.id === typId);
+  if (!typ) return;
+
+  const popover = document.getElementById('ima-context-menu');
+  if (!popover) return;
+
+  popover.innerHTML = `
+    <button onclick="enableGroupLayers('${typId}'); closeAllContextMenus();">
+      <i class="fa-solid fa-check-double" style="color:#059669;"></i> Ativar todas do grupo
+    </button>
+    <button onclick="disableGroupLayers('${typId}'); closeAllContextMenus();">
+      <i class="fa-solid fa-ban" style="color:#64748b;"></i> Desativar todas do grupo
+    </button>
+    <div class="ima-popover-divider"></div>
+    <button onclick="zoomToGroup('${typId}'); closeAllContextMenus();">
+      <i class="fa-solid fa-expand" style="color:#0284c7;"></i> Zoom na extensão do grupo
+    </button>
+  `;
+
+  positionPopover(popover, event.currentTarget);
+}
+
+function enableGroupLayers(typId) {
+  const groupChk = document.getElementById(`chk-group-${typId}`);
+  if (groupChk) groupChk.checked = true;
+  toggleGroupCheckbox(typId, true);
+}
+
+function disableGroupLayers(typId) {
+  const groupChk = document.getElementById(`chk-group-${typId}`);
+  if (groupChk) groupChk.checked = false;
+  toggleGroupCheckbox(typId, false);
+}
+
+function zoomToGroup(typId) {
+  const layersInTyp = LAYERS_CONFIG.filter(l => l.typology === typId);
+  const groupBounds = L.latLngBounds([]);
+  layersInTyp.forEach(l => {
+    const geoLayer = mapLayers[l.id];
+    if (geoLayer && map.hasLayer(geoLayer)) {
+      try {
+        const b = geoLayer.getBounds();
+        if (b && b.isValid()) groupBounds.extend(b);
+      } catch (e) {}
+    }
+  });
+
+  if (groupBounds.isValid()) {
+    map.fitBounds(groupBounds, { padding: [30, 30] });
+  } else {
+    resetCraibasExtent();
+  }
+}
+
+function positionPopover(popover, buttonEl) {
+  const rect = buttonEl.getBoundingClientRect();
+  popover.style.display = 'block';
+
+  // Alinha à esquerda do botão ou dentro da tela
+  const top = rect.bottom + window.scrollY + 4;
+  const right = window.innerWidth - rect.right - window.scrollX;
+
+  popover.style.top = `${top}px`;
+  popover.style.right = `${Math.max(10, right)}px`;
+}
+
+function closeAllContextMenus() {
+  const popover = document.getElementById('ima-context-menu');
+  if (popover) popover.style.display = 'none';
+  const opts = document.getElementById('ima-options-dropdown');
+  if (opts) opts.style.display = 'none';
+}
+
+// Fechar menus de contexto ao clicar fora
+document.addEventListener('click', (e) => {
+  const popover = document.getElementById('ima-context-menu');
+  if (popover && !popover.contains(e.target) && !e.target.closest('.ima-dots-btn')) {
+    popover.style.display = 'none';
+  }
+  const opts = document.getElementById('ima-options-dropdown');
+  if (opts && !opts.contains(e.target) && !e.target.closest('.ima-sub-icon-btn')) {
+    opts.style.display = 'none';
+  }
+});
+
+// Barra de pesquisa rápida da árvore de camadas
+function toggleTreeSearchInput() {
+  const bar = document.getElementById('ima-search-bar');
+  if (!bar) return;
+  const isHidden = bar.style.display === 'none' || bar.style.display === '';
+  bar.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) {
+    const input = document.getElementById('ima-filter-input');
+    if (input) input.focus();
+  }
+}
+
+// Menu dropdown de opções gerais
+function toggleTreeOptionsMenu(event) {
+  event.stopPropagation();
+  const opts = document.getElementById('ima-options-dropdown');
+  if (!opts) return;
+  const isHidden = opts.style.display === 'none' || opts.style.display === '';
+  opts.style.display = isHidden ? 'block' : 'none';
+}
+
+// Filtro de camadas por digitação
+function filterLayersInTree(query) {
+  const q = (query || '').toLowerCase().trim();
+  MAP_TYPOLOGIES.forEach(typ => {
+    const groupEl = document.getElementById(`ima-group-${typ.id}`);
+    const childrenEl = document.getElementById(`children-${typ.id}`);
+    const caret = document.getElementById(`caret-${typ.id}`);
+    if (!groupEl || !childrenEl) return;
+
+    const layersInTyp = LAYERS_CONFIG.filter(l => l.typology === typ.id);
+    let anyMatchInGroup = false;
+
+    layersInTyp.forEach(l => {
+      const row = document.getElementById(`layer-row-${l.id}`);
+      if (!row) return;
+      const matches = !q || l.name.toLowerCase().includes(q) || typ.title.toLowerCase().includes(q);
+      row.style.display = matches ? 'flex' : 'none';
+      if (matches) anyMatchInGroup = true;
+    });
+
+    if (!q) {
+      groupEl.style.display = 'block';
+    } else {
+      groupEl.style.display = anyMatchInGroup ? 'block' : 'none';
+      if (anyMatchInGroup) {
+        childrenEl.classList.add('open');
+        if (caret) caret.classList.add('expanded');
+      }
+    }
+  });
+}
+
 
 // Alternar visibilidade da camada
 function toggleLayer(layerId) {
   const chk = document.getElementById(`chk-${layerId}`);
   const geoLayer = mapLayers[layerId];
+  const label = document.getElementById(`label-${layerId}`);
+
+  if (label && chk) {
+    label.classList.toggle('muted', !chk.checked);
+  }
+
+  const cfg = LAYERS_CONFIG.find(l => l.id === layerId);
+  if (cfg) {
+    updateGroupCheckboxState(cfg.typology);
+  }
 
   if (!geoLayer || !chk) return;
 
@@ -492,6 +776,7 @@ function applyThematicPreset(preset) {
   }
 
   resetCraibasExtent();
+  closeAllContextMenus();
   showToast(`Mapa Temático carregado com sucesso!`, 'success');
 }
 
@@ -890,11 +1175,16 @@ function toggleLayersPanel() {
 
   if (_layersPanelOpen) {
     panel.style.transform = 'translateX(0)';
-    if (btn) btn.title = 'Fechar Painel de Camadas';
+    if (btn) btn.style.display = 'none';
   } else {
     panel.style.transform = 'translateX(100%)';
-    if (btn) btn.title = 'Abrir Painel de Camadas';
+    if (btn) {
+      btn.style.display = 'flex';
+      btn.title = 'Abrir Lista de Camada';
+    }
   }
+
+  closeAllContextMenus();
 
   // Re-renderiza o Leaflet após a animação CSS (300 ms)
   setTimeout(() => { if (map) map.invalidateSize(); }, 320);
