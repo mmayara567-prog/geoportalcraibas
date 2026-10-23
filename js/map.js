@@ -246,72 +246,78 @@ function renderLayerTree() {
   container.innerHTML = '';
 
   MAP_TYPOLOGIES.forEach(typ => {
-    // Filtro rápido por tipologia selecionada
-    if (activeTypologyFilter !== 'all' && activeTypologyFilter !== typ.id) {
-      return;
-    }
+    if (activeTypologyFilter !== 'all' && activeTypologyFilter !== typ.id) return;
 
     const layersInTypology = LAYERS_CONFIG.filter(l => l.typology === typ.id);
     if (layersInTypology.length === 0) return;
 
     const typSection = document.createElement('div');
-    typSection.className = 'border-b border-gray-100 last:border-b-0 typology-section';
+    typSection.className = 'typology-section';
     typSection.dataset.typology = typ.id;
 
     const header = document.createElement('div');
-    header.className = 'typology-header flex items-center justify-between p-3 cursor-pointer bg-slate-50 select-none hover:bg-slate-100';
+    header.className = 'typology-header';
     header.innerHTML = `
-      <div class="flex items-center gap-2.5">
-        <div class="w-7 h-7 rounded-md flex items-center justify-center text-white text-xs shadow-sm flex-shrink-0" style="background-color: ${typ.color}">
-          <i class="fa-solid ${typ.icon}"></i>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:${typ.color};flex-shrink:0;">
+          <i class="fa-solid ${typ.icon}" style="color:#fff;font-size:0.7rem"></i>
         </div>
         <div>
-          <span class="text-xs font-bold text-slate-800">${typ.title}</span>
-          <span class="text-[10px] text-slate-500 block leading-tight">${layersInTypology.length} camada(s)</span>
+          <div style="font-size:0.75rem;font-weight:700;color:#1f2937">${typ.title}</div>
+          <div style="font-size:0.65rem;color:#9ca3af">${layersInTypology.length} camada(s)</div>
         </div>
       </div>
-      <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-200 typ-arrow"></i>
+      <i class="fa-solid fa-chevron-down typ-arrow" style="font-size:0.65rem;color:#9ca3af;transition:transform .2s"></i>
     `;
 
     const body = document.createElement('div');
-    body.className = 'typology-body p-2 space-y-1.5 hidden';
+    body.className = 'typology-body hidden';
+    body.style.cssText = 'padding:6px 10px 10px;display:none';
 
     layersInTypology.forEach(l => {
       const card = document.createElement('div');
-      card.className = 'layer-card p-2 rounded-lg border border-slate-200/80 bg-white hover:border-blue-300 transition-colors';
+      card.className = 'layer-card';
       card.id = `layer-card-${l.id}`;
 
-      let swatch = `<span class="w-3.5 h-3.5 rounded-full inline-block border border-gray-400" style="background-color: ${l.style?.color || l.pointColor || '#2563eb'}"></span>`;
-      if (l.geomType === "Point") {
-        swatch = `<i class="fa-solid ${l.pointIcon || 'fa-location-dot'} text-xs" style="color: ${l.pointColor || '#dc2626'}"></i>`;
-      } else if (l.geomType === "LineString") {
-        swatch = `<span class="w-4 h-1 inline-block rounded" style="background-color: ${l.style?.color || '#dc2626'}"></span>`;
+      let swatch = `<span style="width:13px;height:13px;border-radius:50%;border:1px solid #d1d5db;background:${l.style?.color || l.pointColor || '#16a34a'};display:inline-block;flex-shrink:0"></span>`;
+      if (l.geomType === 'Point') {
+        swatch = `<i class="fa-solid ${l.pointIcon || 'fa-location-dot'}" style="color:${l.pointColor || '#dc2626'};font-size:0.8rem;flex-shrink:0"></i>`;
+      } else if (l.geomType === 'LineString') {
+        swatch = `<span style="width:18px;height:3px;border-radius:2px;background:${l.style?.color || '#dc2626'};display:inline-block;flex-shrink:0"></span>`;
       }
 
       card.innerHTML = `
-        <div class="flex items-center justify-between">
-          <label class="flex items-center gap-2 cursor-pointer flex-1">
-            <input type="checkbox" id="chk-${l.id}" ${l.visibleDefault ? 'checked' : ''} class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-gray-300 cursor-pointer" onchange="toggleLayer('${l.id}')">
-            <div class="flex items-center gap-1.5 flex-1 min-w-0">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <label style="display:flex;align-items:center;gap:7px;cursor:pointer;flex:1;min-width:0">
+            <input type="checkbox" id="chk-${l.id}" ${l.visibleDefault ? 'checked' : ''}
+              style="width:14px;height:14px;accent-color:#16a34a;cursor:pointer;flex-shrink:0"
+              onchange="toggleLayer('${l.id}')">
+            <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
               ${swatch}
-              <span class="text-xs font-medium text-slate-800 truncate" title="${l.name}">${l.name}</span>
+              <span style="font-size:0.73rem;font-weight:600;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${l.name}">${l.name}</span>
             </div>
           </label>
-          <span class="text-[10px] font-semibold px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded-full border border-slate-200">
-            ${l.featureCount}
-          </span>
+          <span style="font-size:0.65rem;font-weight:600;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:99px;padding:1px 7px;flex-shrink:0">${l.featureCount}</span>
         </div>
-
-        <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between gap-2">
-          <div class="flex items-center gap-1.5 flex-1">
-            <i class="fa-solid fa-circle-half-stroke text-[10px] text-slate-400" title="Ajustar Opacidade"></i>
-            <input type="range" min="0" max="100" value="100" class="opacity-slider" oninput="changeLayerOpacity('${l.id}', this.value)" title="Ajustar Opacidade">
+        <div style="margin-top:7px;padding-top:6px;border-top:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="display:flex;align-items:center;gap:6px;flex:1">
+            <i class="fa-solid fa-circle-half-stroke" style="font-size:0.6rem;color:#9ca3af"></i>
+            <input type="range" min="0" max="100" value="100" class="opacity-slider"
+              oninput="changeLayerOpacity('${l.id}', this.value)">
           </div>
-          <div class="flex items-center gap-1">
-            <button class="p-1 text-slate-400 hover:text-blue-600 rounded hover:bg-slate-100 text-xs" title="Aproximar nesta camada" onclick="zoomToLayer('${l.id}')">
+          <div style="display:flex;align-items:center;gap:2px">
+            <button onclick="zoomToLayer('${l.id}')"
+              style="padding:4px 6px;border:none;background:transparent;cursor:pointer;color:#9ca3af;border-radius:5px;font-size:0.7rem;transition:color .12s"
+              onmouseover="this.style.color='#16a34a';this.style.background='#f0fdf4'"
+              onmouseout="this.style.color='#9ca3af';this.style.background='transparent'"
+              title="Zoom para a camada">
               <i class="fa-solid fa-expand"></i>
             </button>
-            <button class="p-1 text-slate-400 hover:text-emerald-600 rounded hover:bg-slate-100 text-xs" title="Visualizar Tabela de Atributos" onclick="openAttributeTable('${l.id}')">
+            <button onclick="openAttributeTable('${l.id}')"
+              style="padding:4px 6px;border:none;background:transparent;cursor:pointer;color:#9ca3af;border-radius:5px;font-size:0.7rem;transition:color .12s"
+              onmouseover="this.style.color='#16a34a';this.style.background='#f0fdf4'"
+              onmouseout="this.style.color='#9ca3af';this.style.background='transparent'"
+              title="Tabela de Atributos">
               <i class="fa-solid fa-table"></i>
             </button>
           </div>
@@ -322,15 +328,18 @@ function renderLayerTree() {
     });
 
     header.addEventListener('click', () => {
-      const isHidden = body.classList.contains('hidden');
-      body.classList.toggle('hidden', !isHidden);
+      const isHidden = body.style.display === 'none' || body.style.display === '';
+      body.style.display = isHidden ? 'block' : 'none';
       header.querySelector('.typ-arrow').style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
     });
 
     // Grupos abertos por padrão
-    if (typ.id === "gestao_publica" || typ.id === "limites_demografia" || typ.id === "zoneamento") {
-      body.classList.remove('hidden');
-      header.querySelector('.typ-arrow').style.transform = 'rotate(180deg)';
+    if (typ.id === 'gestao_publica' || typ.id === 'limites_demografia' || typ.id === 'zoneamento') {
+      body.style.display = 'block';
+      setTimeout(() => {
+        const arrow = header.querySelector('.typ-arrow');
+        if (arrow) arrow.style.transform = 'rotate(180deg)';
+      }, 0);
     }
 
     typSection.appendChild(header);
@@ -339,20 +348,13 @@ function renderLayerTree() {
   });
 }
 
-// Filtro rápido por tipologia na barra lateral
+// Filtro rápido por tipologia
 function filterByTypology(typologyId) {
   activeTypologyFilter = typologyId;
-
   document.querySelectorAll('.typology-pill-btn').forEach(b => {
-    if (b.dataset.typ === typologyId) {
-      b.classList.add('bg-blue-600', 'text-white');
-      b.classList.remove('bg-slate-100', 'text-slate-600');
-    } else {
-      b.classList.remove('bg-blue-600', 'text-white');
-      b.classList.add('bg-slate-100', 'text-slate-600');
-    }
+    const isActive = b.dataset.typ === typologyId;
+    b.classList.toggle('active', isActive);
   });
-
   renderLayerTree();
 }
 
